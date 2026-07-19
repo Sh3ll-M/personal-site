@@ -1,11 +1,15 @@
 import type { ReactNode } from "react";
 import { spaceGrotesk, inter, plexMono } from "./fonts";
+import { Sidebar } from "@/components/Sidebar";
 import "./globals.css";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable} ${plexMono.variable}`}>
-      <body className="min-h-screen bg-bg font-body text-ink">{children}</body>
+      <body className="flex min-h-screen bg-bg font-body text-ink">
+        <Sidebar />
+        <main className="flex-1 px-8 py-8">{children}</main>
+      </body>
     </html>
   );
 }

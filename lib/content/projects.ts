@@ -44,7 +44,7 @@ export function getAllProjects(
     const frontmatter = parseFrontmatter(projectFrontmatterSchema, data, filePath);
     const slug = file.replace(/\.md$/, "");
     const git = gitMeta(path.relative(process.cwd(), filePath));
-    return { ...frontmatter, slug, content, git };
+    return { ...frontmatter, slug, content, git } as Project;
   });
 
   return projects.sort((a, b) => (a.date < b.date ? 1 : -1));
