@@ -11,3 +11,10 @@
   --color-diff-add: #3fb374;
   --color-diff-remove: #e0605c;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
