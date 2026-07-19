@@ -9,10 +9,10 @@ const NAV_ITEMS = [
 
 export function Sidebar() {
   return (
-    <aside className="w-56 shrink-0 border-r border-rule bg-sidebar px-6 py-8">
+    <aside className="w-full shrink-0 border-b border-rule bg-sidebar px-6 py-5 md:w-56 md:border-b-0 md:border-r md:py-8">
       <div className="font-display text-xl font-bold text-ink">Matthew</div>
       <div className="mt-1 font-mono text-xs text-muted">builds &amp; breaks things</div>
-      <nav className="mt-8 flex flex-col gap-3 font-mono text-sm text-muted">
+      <nav className="mt-6 flex gap-4 font-mono text-sm text-muted md:mt-8 md:flex-col md:gap-3">
         {NAV_ITEMS.map((item) => (
           <Link key={item.href} href={item.href} className="transition-colors hover:text-ink">
             {item.label}
