@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { getAllProjects, getProjectBySlug } from "@/lib/content/projects";
 
 export function generateStaticParams() {
@@ -32,7 +34,9 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
           </a>
         )}
       </div>
-      <div className="mt-6 whitespace-pre-wrap text-ink">{project.content}</div>
+      <div className="prose-content mt-6 text-ink">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{project.content}</ReactMarkdown>
+      </div>
     </article>
   );
 }

@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { getAllPosts, getPostBySlug } from "@/lib/content/posts";
 
 export function generateStaticParams() {
@@ -20,7 +22,9 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
         <span className="text-diff-remove">-{post.git.removed}</span>
       </div>
       <h1 className="mt-2 font-display text-3xl font-bold text-ink">{post.title}</h1>
-      <div className="mt-6 whitespace-pre-wrap text-ink">{post.content}</div>
+      <div className="prose-content mt-6 text-ink">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
+      </div>
     </article>
   );
 }
