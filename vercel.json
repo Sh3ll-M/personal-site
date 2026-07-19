@@ -1,3 +1,3 @@
 {
-  "buildCommand": "git fetch --unshallow --quiet || true; next build"
+  "buildCommand": "echo '--- git diagnostics ---'; git remote -v; git rev-parse --is-shallow-repository; git fetch --unshallow --progress 2>&1; git rev-parse --is-shallow-repository; git log -1 --oneline -- content/posts/hello-world.md; echo '--- end diagnostics ---'; next build"
 }
