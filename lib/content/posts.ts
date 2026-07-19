@@ -36,7 +36,7 @@ export function getAllPosts(
     const frontmatter = parseFrontmatter(frontmatterSchema, data, filePath);
     const slug = file.replace(/\.md$/, "");
     const git = gitMeta(path.relative(process.cwd(), filePath));
-    return { ...frontmatter, slug, content, git } as Post;
+    return { ...frontmatter, slug, content, git };
   });
 
   return posts.sort((a, b) => (a.date < b.date ? 1 : -1));
