@@ -14,7 +14,7 @@ export function Sidebar() {
       <div className="mt-1 font-mono text-xs text-muted">builds &amp; breaks things</div>
       <nav className="mt-8 flex flex-col gap-3 font-mono text-sm text-muted">
         {NAV_ITEMS.map((item) => (
-          <Link key={item.href} href={item.href} className="hover:text-ink">
+          <Link key={item.href} href={item.href} className="transition-colors hover:text-ink">
             {item.label}
           </Link>
         ))}
