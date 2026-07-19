@@ -1,10 +1,8 @@
 #!/bin/sh
-echo "[unshallow] git version: $(git --version)"
-echo "[unshallow] remotes:"
-git remote -v
-echo "[unshallow] is-shallow-repository: $(git rev-parse --is-shallow-repository)"
-echo "[unshallow] running: git fetch --unshallow"
-git fetch --unshallow
-echo "[unshallow] fetch exit code: $?"
-echo "[unshallow] is-shallow-repository after: $(git rev-parse --is-shallow-repository)"
-echo "[unshallow] git log for hello-world.md: $(git log -1 --oneline -- content/posts/hello-world.md)"
+# Vercel's GitHub integration clones with a shallow history and no
+# configured git remote, so getGitMetaForFile's `git log` can silently
+# resolve the wrong commit for older content files. Un-shallowing
+# against the repo's own public URL (no remote needed) fixes this.
+if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+  git fetch --unshallow https://github.com/Sh3ll-M/personal-site.git
+fi
