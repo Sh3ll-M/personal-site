@@ -1671,6 +1671,198 @@ git commit -m "feat: collapse sidebar to a top bar on small screens"
 
 ---
 
+### Task 17: Markdown rendering on post/project pages
+
+**Added after the final whole-branch review** — the original plan never included a Markdown renderer, so post/project content displayed as raw text instead of formatted Markdown. This task closes that gap.
+
+**Files:**
+- Modify: `package.json`
+- Modify: `app/globals.css`
+- Modify: `app/blog/[slug]/page.tsx`
+- Modify: `app/projects/[slug]/page.tsx`
+
+**Interfaces:**
+- Consumes: `Post.content`, `Project.content` (already plain Markdown strings, unchanged)
+- Produces: no new exports — this only changes how existing `content` fields are rendered.
+
+- [ ] **Step 1: Add dependencies to `package.json`**
+
+Add these two entries to `dependencies` (alongside the existing `framer-motion` entry):
+
+```json
+    "react-markdown": "^9.0.1",
+    "remark-gfm": "^4.0.0"
+```
+
+- [ ] **Step 2: Run `npm install`**
+
+Run: `npm install`
+Expected: completes with no errors, `package-lock.json` updated.
+
+- [ ] **Step 3: Add Markdown content styling to `app/globals.css`**
+
+Append this block after the existing `@media (prefers-reduced-motion: reduce)` block:
+
+```css
+.prose-content h1,
+.prose-content h2,
+.prose-content h3 {
+  font-family: var(--font-display);
+  color: var(--color-ink);
+  font-weight: 700;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose-content p {
+  margin-bottom: 1em;
+}
+
+.prose-content ul,
+.prose-content ol {
+  margin-left: 1.5em;
+  margin-bottom: 1em;
+}
+
+.prose-content li {
+  margin-bottom: 0.25em;
+}
+
+.prose-content a {
+  color: var(--color-diff-add);
+  text-decoration: underline;
+}
+
+.prose-content code {
+  font-family: var(--font-mono);
+  background: var(--color-sidebar);
+  padding: 0.1em 0.3em;
+  border-radius: 0.25em;
+  font-size: 0.9em;
+}
+
+.prose-content pre {
+  font-family: var(--font-mono);
+  background: var(--color-sidebar);
+  padding: 1em;
+  border-radius: 0.375em;
+  overflow-x: auto;
+  margin-bottom: 1em;
+}
+
+.prose-content pre code {
+  background: none;
+  padding: 0;
+}
+
+.prose-content blockquote {
+  border-left: 2px solid var(--color-rule);
+  padding-left: 1em;
+  color: var(--color-muted);
+  margin-bottom: 1em;
+}
+```
+
+- [ ] **Step 4: Modify `app/blog/[slug]/page.tsx`**
+
+Replace the whole file with:
+
+```tsx
+import { notFound } from "next/navigation";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { getAllPosts, getPostBySlug } from "@/lib/content/posts";
+
+export function generateStaticParams() {
+  return getAllPosts().map((post) => ({ slug: post.slug }));
+}
+
+export default function BlogPostPage({ params }: { params: { slug: string } }) {
+  const post = getPostBySlug(params.slug);
+
+  if (!post) {
+    notFound();
+  }
+
+  return (
+    <article>
+      <div className="font-mono text-xs text-muted">
+        {post.date} &nbsp;{post.git.hash} &nbsp;
+        <span className="text-diff-add">+{post.git.added}</span>{" "}
+        <span className="text-diff-remove">-{post.git.removed}</span>
+      </div>
+      <h1 className="mt-2 font-display text-3xl font-bold text-ink">{post.title}</h1>
+      <div className="prose-content mt-6 text-ink">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
+      </div>
+    </article>
+  );
+}
+```
+
+- [ ] **Step 5: Modify `app/projects/[slug]/page.tsx`**
+
+Replace the whole file with:
+
+```tsx
+import { notFound } from "next/navigation";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { getAllProjects, getProjectBySlug } from "@/lib/content/projects";
+
+export function generateStaticParams() {
+  return getAllProjects().map((project) => ({ slug: project.slug }));
+}
+
+export default function ProjectPage({ params }: { params: { slug: string } }) {
+  const project = getProjectBySlug(params.slug);
+
+  if (!project) {
+    notFound();
+  }
+
+  return (
+    <article>
+      <div className="font-mono text-xs text-muted">
+        {project.date} &nbsp;{project.git.hash} &nbsp;
+        <span className="text-diff-add">+{project.git.added}</span>{" "}
+        <span className="text-diff-remove">-{project.git.removed}</span>
+      </div>
+      <h1 className="mt-2 font-display text-3xl font-bold text-ink">{project.title}</h1>
+      <div className="mt-4 flex gap-4 font-mono text-sm text-diff-add">
+        {project.repoUrl && (
+          <a href={project.repoUrl} target="_blank" rel="noreferrer">
+            repo
+          </a>
+        )}
+        {project.demoUrl && (
+          <a href={project.demoUrl} target="_blank" rel="noreferrer">
+            demo
+          </a>
+        )}
+      </div>
+      <div className="prose-content mt-6 text-ink">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{project.content}</ReactMarkdown>
+      </div>
+    </article>
+  );
+}
+```
+
+- [ ] **Step 6: Verify the app builds**
+
+Run: `npm run build`
+Expected: "Compiled successfully", with `/blog/hello-world` and `/projects/example-project` still statically generated.
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add package.json package-lock.json app/globals.css "app/blog/[slug]/page.tsx" "app/projects/[slug]/page.tsx"
+git commit -m "feat: render post/project content as Markdown instead of raw text"
+```
+
+---
+
 ## Post-plan notes (not implementation tasks)
 
 - Real CV content (`app/cv/page.tsx`) and real project/post write-ups still need to replace the sample entries — flagged in the spec as Matthew's to supply.
