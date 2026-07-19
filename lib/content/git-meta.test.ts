@@ -9,7 +9,7 @@ describe("getGitMetaForFile", () => {
       if (command.includes("--shortstat")) {
         return " 1 file changed, 142 insertions(+), 8 deletions(-)\n";
       }
-      return "a3f9c2|2026-07-12\n";
+      return "a3f9c2,2026-07-12\n";
     };
 
     const meta = getGitMetaForFile("content/posts/hello.md", fakeRun);
@@ -20,7 +20,7 @@ describe("getGitMetaForFile", () => {
 
   it("defaults added/removed to 0 when shortstat has no matching counts", () => {
     const fakeRun = (command: string) =>
-      command.includes("--shortstat") ? " 1 file changed\n" : "1c88d4|2026-06-02\n";
+      command.includes("--shortstat") ? " 1 file changed\n" : "1c88d4,2026-06-02\n";
 
     const meta = getGitMetaForFile("content/posts/new.md", fakeRun);
 
@@ -33,5 +33,13 @@ describe("getGitMetaForFile", () => {
     expect(() => getGitMetaForFile("content/posts/untracked.md", fakeRun)).toThrow(
       /No git history/
     );
+  });
+
+  it("derives real metadata from actual git history (no fake run)", () => {
+    const meta = getGitMetaForFile("package.json");
+    expect(meta.hash).toMatch(/^[0-9a-f]{7,40}$/);
+    expect(meta.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(meta.added).toBeGreaterThanOrEqual(0);
+    expect(meta.removed).toBeGreaterThanOrEqual(0);
   });
 });
