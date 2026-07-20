@@ -2,11 +2,11 @@ import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
-import rehypePrettyCode from "rehype-pretty-code";
+import rehypePrettyCode, { type Options as RehypePrettyCodeOptions } from "rehype-pretty-code";
 import rehypeStringify from "rehype-stringify";
 import { CodeBlock } from "@/components/CodeBlock";
 
-const rehypePrettyCodeOptions = {
+const rehypePrettyCodeOptions: RehypePrettyCodeOptions = {
   theme: "github-dark",
   keepBackground: true,
   defaultLang: "plaintext",
