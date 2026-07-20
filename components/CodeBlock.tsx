@@ -2,11 +2,11 @@
 
 import { useEffect, useRef } from "react";
 
-export function CodeBlock({ html }: { html: string }) {
-  const containerRef = useRef<HTMLDivElement>(null);
+export function CodeBlock() {
+  const markerRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    const container = containerRef.current;
+    const container = markerRef.current?.previousElementSibling;
     if (!container) return;
 
     const figures = container.querySelectorAll<HTMLElement>(
@@ -49,7 +49,7 @@ export function CodeBlock({ html }: { html: string }) {
     return () => {
       cleanups.forEach((cleanup) => cleanup());
     };
-  }, [html]);
+  }, []);
 
-  return <div ref={containerRef} dangerouslySetInnerHTML={{ __html: html }} />;
+  return <span ref={markerRef} hidden />;
 }

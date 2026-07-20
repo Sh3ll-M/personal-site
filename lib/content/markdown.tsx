@@ -26,5 +26,10 @@ async function renderMarkdown(content: string): Promise<string> {
 
 export async function PostMarkdown({ content }: { content: string }) {
   const html = await renderMarkdown(content);
-  return <CodeBlock html={html} />;
+  return (
+    <>
+      <div dangerouslySetInnerHTML={{ __html: html }} />
+      <CodeBlock />
+    </>
+  );
 }
