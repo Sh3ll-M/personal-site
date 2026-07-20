@@ -280,14 +280,16 @@ git commit -m "style: add language badge and line numbers to code blocks"
 
 ### Task 4: Copy-to-clipboard button
 
+**Revision (2026-07-20, final review):** the version originally specified here had `CodeBlock` own the `dangerouslySetInnerHTML` render itself (receiving `html` as a prop), which put the entire article body — not just code blocks — behind a client component boundary, duplicating the rendered HTML into the hydration payload. The final whole-branch review flagged this. The corrected version below keeps `PostMarkdown` a pure Server Component rendering the HTML directly, and turns `CodeBlock` into a props-free enhancer that locates the server-rendered content via `previousElementSibling` and only attaches buttons to it.
+
 **Files:**
 - Create: `components/CodeBlock.tsx`
 - Modify: `lib/content/markdown.tsx`
 - Modify: `app/globals.css`
 
 **Interfaces:**
-- Produces: `CodeBlock({ html: string }): JSX.Element`, a client component exported from `components/CodeBlock.tsx`. It owns rendering the HTML (`dangerouslySetInnerHTML`) itself, since it needs a ref on the container to enhance it after mount.
-- Consumes (modifies): `PostMarkdown` in `lib/content/markdown.tsx` (Task 1) — instead of returning `<div dangerouslySetInnerHTML>` directly, it now returns `<CodeBlock html={html} />`.
+- Produces: `CodeBlock(): JSX.Element`, a client component exported from `components/CodeBlock.tsx`, taking no props. Renders only a hidden marker element and enhances its preceding sibling on mount.
+- Consumes (modifies): `PostMarkdown` in `lib/content/markdown.tsx` (Task 1) — now renders `<div dangerouslySetInnerHTML>` directly (as Task 1 originally had it) followed by a sibling `<CodeBlock />`.
 
 - [ ] **Step 1: Create the CodeBlock client component**
 
@@ -298,11 +300,11 @@ Create `components/CodeBlock.tsx`:
 
 import { useEffect, useRef } from "react";
 
-export function CodeBlock({ html }: { html: string }) {
-  const containerRef = useRef<HTMLDivElement>(null);
+export function CodeBlock() {
+  const markerRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    const container = containerRef.current;
+    const container = markerRef.current?.previousElementSibling;
     if (!container) return;
 
     const figures = container.querySelectorAll<HTMLElement>(
@@ -345,26 +347,26 @@ export function CodeBlock({ html }: { html: string }) {
     return () => {
       cleanups.forEach((cleanup) => cleanup());
     };
-  }, [html]);
+  }, []);
 
-  return <div ref={containerRef} dangerouslySetInnerHTML={{ __html: html }} />;
+  return <span ref={markerRef} hidden />;
 }
 ```
 
 - [ ] **Step 2: Wire it into the shared renderer**
 
-Modify `lib/content/markdown.tsx` — replace the plain `<div dangerouslySetInnerHTML>` return with `<CodeBlock>`:
+Modify `lib/content/markdown.tsx` — keep the plain `<div dangerouslySetInnerHTML>` return, and render `<CodeBlock />` as a sibling right after it (note: `PostMarkdown` stays a Server Component; only `CodeBlock` is a client component):
 
 ```tsx
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
-import rehypePrettyCode from "rehype-pretty-code";
+import rehypePrettyCode, { type Options as RehypePrettyCodeOptions } from "rehype-pretty-code";
 import rehypeStringify from "rehype-stringify";
 import { CodeBlock } from "@/components/CodeBlock";
 
-const rehypePrettyCodeOptions = {
+const rehypePrettyCodeOptions: RehypePrettyCodeOptions = {
   theme: "github-dark",
   keepBackground: true,
   defaultLang: "plaintext",
@@ -384,7 +386,12 @@ async function renderMarkdown(content: string): Promise<string> {
 
 export async function PostMarkdown({ content }: { content: string }) {
   const html = await renderMarkdown(content);
-  return <CodeBlock html={html} />;
+  return (
+    <>
+      <div dangerouslySetInnerHTML={{ __html: html }} />
+      <CodeBlock />
+    </>
+  );
 }
 ```
 
