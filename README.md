@@ -26,8 +26,10 @@ out as a vertical timeline.
   `content/projects/`), parsed with [gray-matter](https://github.com/jonschlinkert/gray-matter)
   and validated with [Zod](https://zod.dev/) — a malformed post fails the build
   loudly instead of shipping broken
-- [react-markdown](https://github.com/remarkjs/react-markdown) +
-  [remark-gfm](https://github.com/remarkjs/remark-gfm) render post/project content
+- Post/project content is rendered with a [unified](https://unifiedjs.com/)
+  pipeline ([remark-gfm](https://github.com/remarkjs/remark-gfm) +
+  [rehype-pretty-code](https://rehype-pretty.pages.dev/) on
+  [Shiki](https://shiki.style/) for syntax highlighting)
 - [Vitest](https://vitest.dev/) covers the content-loading logic
   (`lib/content/*`) — schema validation, git-metadata parsing, sorting/slug
   derivation
