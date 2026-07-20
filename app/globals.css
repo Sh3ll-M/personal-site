@@ -76,3 +76,42 @@
   color: var(--color-muted);
   margin-bottom: 1em;
 }
+
+figure[data-rehype-pretty-code-figure] {
+  position: relative;
+}
+
+.prose-content pre[data-language]::before {
+  content: attr(data-language);
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  pointer-events: none;
+}
+
+.prose-content pre[data-language="plaintext"]::before {
+  content: none;
+}
+
+.prose-content pre code {
+  counter-reset: line;
+}
+
+.prose-content pre code > [data-line] {
+  counter-increment: line;
+  display: inline-block;
+  width: 100%;
+}
+
+.prose-content pre code > [data-line]::before {
+  content: counter(line);
+  display: inline-block;
+  width: 1.5em;
+  margin-right: 1em;
+  text-align: right;
+  color: var(--color-muted);
+  user-select: none;
+}
