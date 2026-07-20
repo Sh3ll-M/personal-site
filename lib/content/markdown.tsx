@@ -4,6 +4,7 @@ import remarkGfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeStringify from "rehype-stringify";
+import { CodeBlock } from "@/components/CodeBlock";
 
 const rehypePrettyCodeOptions = {
   theme: "github-dark",
@@ -25,5 +26,5 @@ async function renderMarkdown(content: string): Promise<string> {
 
 export async function PostMarkdown({ content }: { content: string }) {
   const html = await renderMarkdown(content);
-  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+  return <CodeBlock html={html} />;
 }
