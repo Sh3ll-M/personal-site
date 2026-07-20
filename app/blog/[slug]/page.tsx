@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { getAllPosts, getPostBySlug } from "@/lib/content/posts";
+import { PostMarkdown } from "@/lib/content/markdown";
 
 export function generateStaticParams() {
   return getAllPosts().map((post) => ({ slug: post.slug }));
@@ -23,7 +22,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
       </div>
       <h1 className="mt-2 font-display text-3xl font-bold text-ink">{post.title}</h1>
       <div className="prose-content mt-6 text-ink">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
+        <PostMarkdown content={post.content} />
       </div>
     </article>
   );
