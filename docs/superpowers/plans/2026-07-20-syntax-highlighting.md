@@ -4,9 +4,9 @@
 
 **Goal:** Add build-time syntax highlighting (with a language badge, line numbers, and a copy-to-clipboard button) to fenced code blocks rendered from post/project Markdown.
 
-**Architecture:** `rehype-pretty-code` (built on Shiki) runs as a rehype plugin inside the existing `ReactMarkdown` pipeline, highlighting at build time since both content routes are statically generated. The duplicated `ReactMarkdown` setup in the blog and project page files is consolidated into one shared `<PostMarkdown>` component. Badge and line numbers are pure CSS keyed off data attributes the plugin already emits; only the copy button needs a small client component.
+**Architecture:** `rehype-pretty-code` (built on Shiki) runs inside a raw `unified` pipeline (`remark-parse` → `remark-gfm` → `remark-rehype` → `rehype-pretty-code` → `rehype-stringify`) — **not** through `react-markdown`, because `react-markdown@9` processes synchronously (`runSync`) and `rehype-pretty-code`'s transformer is inherently async (Shiki highlighting is async); the two are incompatible, confirmed against `react-markdown`'s source and `rehype-pretty-code`'s docs. The pipeline's HTML output is rendered via `dangerouslySetInnerHTML` in an `async` Server Component, at build time since both content routes are statically generated. The duplicated `ReactMarkdown` setup previously in the blog and project page files is consolidated into one shared `<PostMarkdown>` component (which no longer uses `react-markdown` at all). Badge and line numbers are pure CSS keyed off data attributes the plugin already emits; only the copy button needs a small client component.
 
-**Tech Stack:** Next.js 14 (App Router, existing), `react-markdown` v9 + `remark-gfm` v4 (existing), `rehype-pretty-code` + `shiki` (new, both ESM-only — no special Next config needed, this repo already depends on ESM-only packages like `react-markdown`/`remark-gfm` without issue).
+**Tech Stack:** Next.js 14 (App Router, existing). `react-markdown` is removed once both pages migrate (Task 2) in favor of `unified` + `remark-parse` + `remark-gfm` (kept) + `remark-rehype` + `rehype-stringify` + `rehype-pretty-code` + `shiki` (all new except `remark-gfm`), all ESM-only — no special Next config needed, this repo already depended on ESM-only packages (`react-markdown`, `remark-gfm`) without issue.
 
 ## Global Constraints
 
@@ -15,6 +15,7 @@
 - No automated test coverage for rendering output — `vitest` in this repo is unit-level only; every task below is verified manually via the dev server.
 - Clipboard write failures are caught and silently no-op (no error UI) — the site is HTTPS-only via Vercel, so this is a minor, unlikely edge case.
 - Fenced code blocks with no language in the info string fall back to plaintext highlighting via `defaultLang: "plaintext"`, and must show **no** language badge.
+- Markdown content is entirely author-authored (Matthew's own files in `content/`, never user input), so rendering it via `dangerouslySetInnerHTML` carries no injection risk — this is a deliberate, scoped exception, not a general pattern to reuse for untrusted input.
 
 ---
 
@@ -26,22 +27,25 @@
 - Modify: `app/blog/[slug]/page.tsx:1-30`
 
 **Interfaces:**
-- Produces: `PostMarkdown({ content: string }): JSX.Element`, exported from `lib/content/markdown.tsx`. Later tasks (2, 4) import and extend this component.
+- Produces: `PostMarkdown({ content: string }): Promise<JSX.Element>` (an `async` Server Component), exported from `lib/content/markdown.tsx`. Later tasks (2, 4) import and extend this component. `PostMarkdown` is used the normal way as `<PostMarkdown content={...} />` — Next.js App Router resolves async Server Components in the tree without the caller needing to `await` it itself.
 
 - [ ] **Step 1: Install dependencies**
 
-Run: `npm install rehype-pretty-code shiki`
+Run: `npm install rehype-pretty-code shiki unified remark-parse remark-rehype rehype-stringify`
 
-Expected: `package.json` gains `rehype-pretty-code` and `shiki` under `dependencies`; `package-lock.json` (or equivalent) updates.
+Expected: `package.json` gains `rehype-pretty-code`, `shiki`, `unified`, `remark-parse`, `remark-rehype`, and `rehype-stringify` under `dependencies`; `package-lock.json` (or equivalent) updates. (`react-markdown` stays in `package.json` for now — `app/projects/[slug]/page.tsx` still imports it until Task 2.)
 
 - [ ] **Step 2: Create the shared Markdown renderer**
 
 Create `lib/content/markdown.tsx`:
 
 ```tsx
-import ReactMarkdown from "react-markdown";
+import { unified } from "unified";
+import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
+import remarkRehype from "remark-rehype";
 import rehypePrettyCode from "rehype-pretty-code";
+import rehypeStringify from "rehype-stringify";
 
 const rehypePrettyCodeOptions = {
   theme: "github-dark",
@@ -49,15 +53,21 @@ const rehypePrettyCodeOptions = {
   defaultLang: "plaintext",
 };
 
-export function PostMarkdown({ content }: { content: string }) {
-  return (
-    <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
-      rehypePlugins={[[rehypePrettyCode, rehypePrettyCodeOptions]]}
-    >
-      {content}
-    </ReactMarkdown>
-  );
+async function renderMarkdown(content: string): Promise<string> {
+  const file = await unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(remarkRehype)
+    .use(rehypePrettyCode, rehypePrettyCodeOptions)
+    .use(rehypeStringify)
+    .process(content);
+
+  return String(file);
+}
+
+export async function PostMarkdown({ content }: { content: string }) {
+  const html = await renderMarkdown(content);
+  return <div dangerouslySetInnerHTML={{ __html: html }} />;
 }
 ```
 
@@ -177,14 +187,26 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
 }
 ```
 
-- [ ] **Step 2: Manually verify**
+- [ ] **Step 2: Remove the now-unused `react-markdown` dependency**
+
+Both pages now use `PostMarkdown` (`lib/content/markdown.tsx`), which doesn't use `react-markdown` — confirm nothing else in the repo imports it, then remove it:
+
+```bash
+grep -rn "react-markdown" --include="*.tsx" --include="*.ts" app lib components
+```
+
+Expected: no matches. Then run: `npm uninstall react-markdown`
+
+Expected: `react-markdown` removed from `package.json` dependencies; `package-lock.json` updates.
+
+- [ ] **Step 3: Manually verify**
 
 Temporarily append the same fenced code block (from Task 1, Step 4) to `content/projects/example-project.md`. Run `npm run dev`, open `http://localhost:3000/projects/example-project`, confirm highlighting renders. Revert: `git checkout -- content/projects/example-project.md`
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 4: Commit**
 
 ```bash
-git add app/projects/[slug]/page.tsx
+git add app/projects/[slug]/page.tsx package.json package-lock.json
 git commit -m "feat: use shared PostMarkdown renderer on project detail page"
 ```
 
@@ -264,8 +286,8 @@ git commit -m "style: add language badge and line numbers to code blocks"
 - Modify: `app/globals.css`
 
 **Interfaces:**
-- Produces: `CodeBlock(props: React.ComponentPropsWithoutRef<"pre">): JSX.Element`, a client component exported from `components/CodeBlock.tsx`.
-- Consumes (modifies): `PostMarkdown` in `lib/content/markdown.tsx` (Task 1) — adds a `components` prop to the existing `ReactMarkdown` call.
+- Produces: `CodeBlock({ html: string }): JSX.Element`, a client component exported from `components/CodeBlock.tsx`. It owns rendering the HTML (`dangerouslySetInnerHTML`) itself, since it needs a ref on the container to enhance it after mount.
+- Consumes (modifies): `PostMarkdown` in `lib/content/markdown.tsx` (Task 1) — instead of returning `<div dangerouslySetInnerHTML>` directly, it now returns `<CodeBlock html={html} />`.
 
 - [ ] **Step 1: Create the CodeBlock client component**
 
@@ -274,47 +296,72 @@ Create `components/CodeBlock.tsx`:
 ```tsx
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
-export function CodeBlock(props: React.ComponentPropsWithoutRef<"pre">) {
-  const preRef = useRef<HTMLPreElement>(null);
-  const [copied, setCopied] = useState(false);
+export function CodeBlock({ html }: { html: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  async function handleCopy() {
-    const code = preRef.current?.querySelector("code")?.textContent ?? "";
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      // Clipboard unavailable — silently no-op per design spec.
-    }
-  }
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
 
-  return (
-    <div className="code-block-wrapper">
-      <pre {...props} ref={preRef} />
-      <button
-        type="button"
-        onClick={handleCopy}
-        className="code-copy-button"
-        aria-label="Copy code to clipboard"
-      >
-        {copied ? "Copied" : "Copy"}
-      </button>
-    </div>
-  );
+    const figures = container.querySelectorAll<HTMLElement>(
+      "figure[data-rehype-pretty-code-figure]"
+    );
+    const cleanups: Array<() => void> = [];
+
+    figures.forEach((figure) => {
+      const codeEl = figure.querySelector("code");
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "code-copy-button";
+      button.setAttribute("aria-label", "Copy code to clipboard");
+      button.textContent = "Copy";
+
+      let revertTimeout: ReturnType<typeof setTimeout> | undefined;
+      const handleClick = async () => {
+        const code = codeEl?.textContent ?? "";
+        try {
+          await navigator.clipboard.writeText(code);
+          button.textContent = "Copied";
+          revertTimeout = setTimeout(() => {
+            button.textContent = "Copy";
+          }, 1500);
+        } catch {
+          // Clipboard unavailable — silently no-op per design spec.
+        }
+      };
+
+      button.addEventListener("click", handleClick);
+      figure.appendChild(button);
+
+      cleanups.push(() => {
+        button.removeEventListener("click", handleClick);
+        if (revertTimeout) clearTimeout(revertTimeout);
+        button.remove();
+      });
+    });
+
+    return () => {
+      cleanups.forEach((cleanup) => cleanup());
+    };
+  }, [html]);
+
+  return <div ref={containerRef} dangerouslySetInnerHTML={{ __html: html }} />;
 }
 ```
 
 - [ ] **Step 2: Wire it into the shared renderer**
 
-Modify `lib/content/markdown.tsx` — add the import and `components` prop:
+Modify `lib/content/markdown.tsx` — replace the plain `<div dangerouslySetInnerHTML>` return with `<CodeBlock>`:
 
 ```tsx
-import ReactMarkdown from "react-markdown";
+import { unified } from "unified";
+import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
+import remarkRehype from "remark-rehype";
 import rehypePrettyCode from "rehype-pretty-code";
+import rehypeStringify from "rehype-stringify";
 import { CodeBlock } from "@/components/CodeBlock";
 
 const rehypePrettyCodeOptions = {
@@ -323,28 +370,29 @@ const rehypePrettyCodeOptions = {
   defaultLang: "plaintext",
 };
 
-export function PostMarkdown({ content }: { content: string }) {
-  return (
-    <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
-      rehypePlugins={[[rehypePrettyCode, rehypePrettyCodeOptions]]}
-      components={{ pre: CodeBlock }}
-    >
-      {content}
-    </ReactMarkdown>
-  );
+async function renderMarkdown(content: string): Promise<string> {
+  const file = await unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(remarkRehype)
+    .use(rehypePrettyCode, rehypePrettyCodeOptions)
+    .use(rehypeStringify)
+    .process(content);
+
+  return String(file);
+}
+
+export async function PostMarkdown({ content }: { content: string }) {
+  const html = await renderMarkdown(content);
+  return <CodeBlock html={html} />;
 }
 ```
 
-- [ ] **Step 3: Add wrapper/button CSS**
+- [ ] **Step 3: Add button CSS**
 
-Append to `app/globals.css`:
+The button is appended directly as a child of `figure[data-rehype-pretty-code-figure]`, which Task 3 already made `position: relative` — no extra wrapper needed. Append to `app/globals.css`:
 
 ```css
-.code-block-wrapper {
-  position: relative;
-}
-
 .code-copy-button {
   position: absolute;
   top: 0.5em;
@@ -398,10 +446,11 @@ Run `npm run dev`, open the post, confirm the block renders as plain (unhighligh
 Run, in order:
 ```bash
 npm run typecheck
-npm run lint
 npm run build
 ```
-Expected: all three complete without errors. `npm run build` in particular confirms Shiki's build-time highlighting succeeds across both statically-generated content routes.
+Expected: both complete without errors. `npm run build` in particular confirms Shiki's build-time highlighting succeeds across both statically-generated content routes.
+
+(`npm run lint` is intentionally skipped: this repo has no ESLint config yet, so `next lint` prompts interactively to create one on first run — a pre-existing gap unrelated to this feature. Don't answer the prompt or create a config as part of this task; that's out of scope here.)
 
 - [ ] **Step 3: Commit (only if Step 2 required fixes)**
 
