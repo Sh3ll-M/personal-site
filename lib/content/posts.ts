@@ -50,3 +50,21 @@ export function getPostBySlug(
 ): Post | undefined {
   return getAllPosts(postsDir, fsImpl, gitMeta).find((post) => post.slug === slug);
 }
+
+export type TagCount = { tag: string; count: number };
+
+export function getAllTags(posts: Post[] = getAllPosts()): TagCount[] {
+  const counts = new Map<string, number>();
+  for (const post of posts) {
+    for (const tag of post.tags) {
+      counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    }
+  }
+  return Array.from(counts.entries())
+    .map(([tag, count]) => ({ tag, count }))
+    .sort((a, b) => a.tag.localeCompare(b.tag));
+}
+
+export function getPostsByTag(tag: string, posts: Post[] = getAllPosts()): Post[] {
+  return posts.filter((post) => post.tags.includes(tag));
+}

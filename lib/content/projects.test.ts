@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { getAllProjects, getProjectBySlug } from "./projects";
+import {
+  getAllProjects,
+  getProjectBySlug,
+  getAllProjectTags,
+  getProjectsByTag,
+  type Project,
+} from "./projects";
 
 const fakeGitMeta = () => ({ hash: "def456", date: "2026-07-01", added: 20, removed: 0 });
 
@@ -40,5 +46,31 @@ describe("getProjectBySlug", () => {
 
   it("returns undefined for an unknown slug", () => {
     expect(getProjectBySlug("missing", "content/projects", fakeFs, fakeGitMeta)).toBeUndefined();
+  });
+});
+
+const fakeGit = { hash: "def456", date: "2026-07-01", added: 20, removed: 0 };
+
+const fakeProjects: Project[] = [
+  { slug: "project-a", title: "Project A", date: "2026-07-01", tags: ["nextjs", "typescript"], excerpt: "A", content: "", git: fakeGit },
+  { slug: "project-b", title: "Project B", date: "2026-07-05", tags: ["nextjs"], excerpt: "B", content: "", git: fakeGit },
+];
+
+describe("getAllProjectTags", () => {
+  it("counts each tag across all projects, sorted alphabetically", () => {
+    expect(getAllProjectTags(fakeProjects)).toEqual([
+      { tag: "nextjs", count: 2 },
+      { tag: "typescript", count: 1 },
+    ]);
+  });
+});
+
+describe("getProjectsByTag", () => {
+  it("returns only projects with the matching tag", () => {
+    expect(getProjectsByTag("typescript", fakeProjects).map((p) => p.slug)).toEqual(["project-a"]);
+  });
+
+  it("returns an empty array for an unknown tag", () => {
+    expect(getProjectsByTag("nonexistent", fakeProjects)).toEqual([]);
   });
 });

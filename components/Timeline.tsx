@@ -6,9 +6,21 @@ type TimelineItem = {
   excerpt: string;
   date: string;
   git: { hash: string; added: number; removed: number };
+  tags?: string[];
 };
 
-export function Timeline({ items, basePath }: { items: TimelineItem[]; basePath: string }) {
+export function Timeline({
+  items,
+  basePath,
+  tagsBasePath,
+}: {
+  items: TimelineItem[];
+  basePath: string;
+  /** Base path for tag chip links, e.g. "/blog/tags". Defaults to `${basePath}/tags`. */
+  tagsBasePath?: string;
+}) {
+  const resolvedTagsBasePath = tagsBasePath ?? `${basePath}/tags`;
+
   return (
     <ul className="relative space-y-8 border-l border-rule pl-2">
       {items.map((item) => (
@@ -21,6 +33,8 @@ export function Timeline({ items, basePath }: { items: TimelineItem[]; basePath:
           removed={item.git.removed}
           title={item.title}
           excerpt={item.excerpt}
+          tags={item.tags}
+          tagsBasePath={resolvedTagsBasePath}
         />
       ))}
     </ul>

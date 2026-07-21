@@ -11,9 +11,21 @@ type TimelineEntryProps = {
   removed: number;
   title: string;
   excerpt: string;
+  tags?: string[];
+  tagsBasePath?: string;
 };
 
-export function TimelineEntry({ href, hash, date, added, removed, title, excerpt }: TimelineEntryProps) {
+export function TimelineEntry({
+  href,
+  hash,
+  date,
+  added,
+  removed,
+  title,
+  excerpt,
+  tags,
+  tagsBasePath = "/blog/tags",
+}: TimelineEntryProps) {
   const reduceMotion = useReducedMotion();
 
   return (
@@ -33,6 +45,19 @@ export function TimelineEntry({ href, hash, date, added, removed, title, excerpt
         {title}
       </Link>
       <p className="mt-1 text-sm text-muted">{excerpt}</p>
+      {tags && tags.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-2 font-mono text-xs text-muted">
+          {tags.map((tag) => (
+            <Link
+              key={tag}
+              href={`${tagsBasePath}/${tag}`}
+              className="rounded border border-rule px-2 py-0.5 hover:border-diff-add hover:text-ink"
+            >
+              {tag}
+            </Link>
+          ))}
+        </div>
+      )}
     </motion.li>
   );
 }
