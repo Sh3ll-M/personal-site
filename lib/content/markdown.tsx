@@ -12,7 +12,7 @@ const rehypePrettyCodeOptions: RehypePrettyCodeOptions = {
   defaultLang: "plaintext",
 };
 
-async function renderMarkdown(content: string): Promise<string> {
+export async function renderMarkdown(content: string): Promise<string> {
   const file = await unified()
     .use(remarkParse)
     .use(remarkGfm)

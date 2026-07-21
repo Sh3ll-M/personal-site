@@ -54,6 +54,10 @@ Body content here.
 Commit and push — the commit hash and diffstat shown next to the post are
 derived automatically from that file's own git history, not hand-typed.
 
+To embed an image in a post, drop the file under
+`public/images/posts/<slug>/<filename>` and reference it from the post's
+Markdown as `/images/posts/<slug>/<filename>` (standard `![alt](src)` syntax).
+
 ## Local development
 
 ```bash
