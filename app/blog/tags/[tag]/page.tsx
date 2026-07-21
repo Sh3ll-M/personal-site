@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllTags, getPostsByTag } from "@/lib/content/posts";
 import { Timeline } from "@/components/Timeline";
@@ -16,7 +17,10 @@ export default function BlogTagPage({ params }: { params: { tag: string } }) {
   return (
     <div>
       <h1 className="font-display text-2xl font-bold text-ink">
-        Posts tagged <span className="text-diff-add">{params.tag}</span>
+        Posts tagged{" "}
+        <Link href="/blog" className="text-diff-add hover:underline" title="Clear filter">
+          {params.tag}
+        </Link>
       </h1>
       <div className="mt-6">
         <Timeline items={posts} basePath="/blog" />
