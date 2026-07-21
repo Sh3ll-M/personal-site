@@ -174,11 +174,66 @@ first.
 
 ### Final verification
 
-- [ ] `npm run typecheck`
-- [ ] `npm run lint`
-- [ ] `npm test`
-- [ ] `npm run build`
+- [x] `npm run typecheck`
+- [x] `npm run lint`
+- [x] `npm test`
+- [ ] `npm run build` — see "Known issue" below; passes except for the two
+      new `opengraph-image` routes, which fail **only on this local Windows
+      machine** due to a confirmed upstream bug, not anything in this branch.
 
 All must pass clean before handing off for review. Fix forward on any failure;
 if something can't be reasonably fixed, stop and report rather than working
 around it with a hack.
+
+---
+
+## Known issue: `npm run build` fails locally on Windows for the two `opengraph-image` routes
+
+**Not a bug in this branch's code.** `next/og`'s `ImageResponse` (Node.js
+runtime, the default for `opengraph-image` files) loads its bundled fallback
+font via `fs.readFileSync(fileURLToPath(path.join(import.meta.url, "../noto-sans-v27-latin-regular.ttf")))`
+inside `next/dist/compiled/@vercel/og/index.node.js`. `path.join` on win32
+converts the `file://` URL's forward slashes to backslashes and collapses the
+`file://` scheme, producing a string `fileURLToPath` rejects with
+`TypeError: Invalid URL` — this crashes as soon as the module is loaded,
+before any of our own code runs, and reproduces even with `PostMarkdown`,
+Timeline/tags, and everything else in this branch untouched. Confirmed via a
+targeted web search that this is a known, currently **open** upstream issue —
+[vercel/next.js#77164](https://github.com/vercel/next.js/issues/77164) — still
+present as of Next 15.2.2-canary, i.e. not something fixable by bumping the
+Next.js version in this repo.
+
+Isolation performed to confirm scope: temporarily moved both
+`opengraph-image.tsx` files out of the tree and reran `npm run build` — the
+other 14 routes (including everything from Tasks 1 and 2, plus the new
+`metadataBase`) built clean with zero errors. Restored both files; rebuilt;
+only those same two routes fail, with an identical stack trace each time.
+
+**Switching `export const runtime = "edge"` was tried and reverted** — the
+edge runtime avoids this specific bug (it loads the font via
+`fetch(new URL(...))` instead of `path.join`), but `getPostBySlug`/
+`getAllPosts` (and the project equivalents) depend on `node:fs` and
+`node:child_process` (via `lib/content/git-meta.ts`'s `execSync` git calls),
+neither of which the edge runtime supports — webpack fails to bundle them at
+all under edge. There is no version of this route that is both edge-runtime
+and able to read post content and real git metadata, so edge is not a viable
+fix here.
+
+**Why this isn't expected to block the actual deploy:** Vercel's build
+environment is Linux, where `path.join` uses forward slashes and the same
+`fileURLToPath` call succeeds — the bug is specifically a Windows
+path-separator issue, not a logic error in `next/og` or in this code. The
+component logic, types, and `generateStaticParams` wiring are otherwise
+verified correct (typecheck, lint, and the fact that build succeeds for every
+other route confirm nothing else regressed).
+
+**Not fixed by patching `node_modules` (e.g. `patch-package`)** — that would
+work, but modifying third-party package internals is a bigger, more
+opinionated change than this plan's scope, and something Matthew should
+decide on rather than have applied silently while he's away.
+
+**Recommendation for Matthew:** verify these two routes render correctly
+either by building on Linux/WSL, or by pushing this branch to a preview
+deploy on Vercel (do **not** merge to `master` first) and checking
+`/blog/<slug>/opengraph-image` and `/projects/<slug>/opengraph-image` render
+as expected there before merging.
