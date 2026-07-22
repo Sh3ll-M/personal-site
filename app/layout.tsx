@@ -3,10 +3,13 @@ import type { Metadata } from "next";
 import { spaceGrotesk, inter, plexMono } from "./fonts";
 import { Sidebar } from "@/components/Sidebar";
 import { SITE_URL } from "@/lib/site";
+import { SITE_NAME } from "@/lib/metadata";
 import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  title: { default: SITE_NAME, template: `%s | ${SITE_NAME}` },
+  description: "Sh3ll-M — CV, blog posts, and project write-ups, rendered as a git commit log.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
