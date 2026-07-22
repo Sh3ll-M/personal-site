@@ -1,5 +1,12 @@
 import { getAllProjects } from "@/lib/content/projects";
 import { ProjectCard } from "@/components/ProjectCard";
+import { buildMetadata } from "@/lib/metadata";
+
+export const metadata = buildMetadata({
+  title: "Projects",
+  description: "Project write-ups from Sh3ll-M, rendered as a git commit log.",
+  path: "/projects",
+});
 
 export default function ProjectsPage() {
   const projects = getAllProjects();

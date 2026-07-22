@@ -1,5 +1,12 @@
 import { getAllPosts } from "@/lib/content/posts";
 import { Timeline } from "@/components/Timeline";
+import { buildMetadata } from "@/lib/metadata";
+
+export const metadata = buildMetadata({
+  title: "Blog",
+  description: "All blog posts from Sh3ll-M, rendered as a git commit log.",
+  path: "/blog",
+});
 
 export default function BlogPage() {
   const posts = getAllPosts();

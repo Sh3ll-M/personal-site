@@ -1,3 +1,11 @@
+import { buildMetadata } from "@/lib/metadata";
+
+export const metadata = buildMetadata({
+  title: "CV",
+  description: "Sh3ll-M's CV — experience, skills, and background.",
+  path: "/cv",
+});
+
 type ExperienceEntry = {
   role: string;
   org: string;

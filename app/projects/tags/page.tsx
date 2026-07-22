@@ -1,5 +1,12 @@
 import Link from "next/link";
 import { getAllProjectTags } from "@/lib/content/projects";
+import { buildMetadata } from "@/lib/metadata";
+
+export const metadata = buildMetadata({
+  title: "Project Tags",
+  description: "Browse Sh3ll-M's projects by tag.",
+  path: "/projects/tags",
+});
 
 export default function ProjectTagsPage() {
   const tags = getAllProjectTags();

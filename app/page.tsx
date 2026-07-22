@@ -1,6 +1,13 @@
 import { getAllPosts } from "@/lib/content/posts";
 import { Timeline } from "@/components/Timeline";
 import { Hero } from "@/components/Hero";
+import { buildMetadata } from "@/lib/metadata";
+
+export const metadata = buildMetadata({
+  title: "Home",
+  description: "Recent posts and projects from Sh3ll-M, presented as a git commit log.",
+  path: "/",
+});
 
 export default function HomePage() {
   const recentPosts = getAllPosts().slice(0, 3);

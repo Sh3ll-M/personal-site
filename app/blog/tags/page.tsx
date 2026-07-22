@@ -1,5 +1,12 @@
 import Link from "next/link";
 import { getAllTags } from "@/lib/content/posts";
+import { buildMetadata } from "@/lib/metadata";
+
+export const metadata = buildMetadata({
+  title: "Blog Tags",
+  description: "Browse Sh3ll-M's blog posts by tag.",
+  path: "/blog/tags",
+});
 
 export default function BlogTagsPage() {
   const tags = getAllTags();
