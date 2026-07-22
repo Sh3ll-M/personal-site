@@ -2,7 +2,7 @@
 
 ## Context
 
-`app/layout.tsx`'s `metadata` export currently sets only `metadataBase`; every one of the site's 9 routes renders with an empty `<title>` and no meta description. This is QoL Chunk A from the 2026-07-21 planning session — agreed to go first since sitemap, social sharing, and search-engine indexing all depend on it. Chunks B (favicon), C (content discovery), and D (CI) are separate follow-on specs.
+`app/layout.tsx`'s `metadata` export currently sets only `metadataBase`; every one of the site's 10 routes renders with an empty `<title>` and no meta description. This is QoL Chunk A from the 2026-07-21 planning session — agreed to go first since sitemap, social sharing, and search-engine indexing all depend on it. Chunks B (favicon), C (content discovery), and D (CI) are separate follow-on specs.
 
 ## Goals
 
@@ -38,7 +38,7 @@ title: { default: "Sh3ll-M", template: "%s | Sh3ll-M" },
 description: "Sh3ll-M — CV, blog posts, and project write-ups, rendered as a git commit log."
 ```
 
-**Per-page metadata (9 routes):**
+**Per-page metadata (10 routes):**
 
 | Route | Kind | Source |
 |---|---|---|
