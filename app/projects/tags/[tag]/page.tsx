@@ -2,9 +2,20 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllProjectTags, getProjectsByTag } from "@/lib/content/projects";
 import { ProjectCard } from "@/components/ProjectCard";
+import { buildMetadata } from "@/lib/metadata";
 
 export function generateStaticParams() {
   return getAllProjectTags().map(({ tag }) => ({ tag }));
+}
+
+export function generateMetadata({ params }: { params: { tag: string } }) {
+  const projects = getProjectsByTag(params.tag);
+
+  return buildMetadata({
+    title: `Projects tagged "${params.tag}"`,
+    description: `${projects.length} project${projects.length === 1 ? "" : "s"} tagged "${params.tag}" on Sh3ll-M.`,
+    path: `/projects/tags/${params.tag}`,
+  });
 }
 
 export default function ProjectTagPage({ params }: { params: { tag: string } }) {

@@ -2,9 +2,20 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllTags, getPostsByTag } from "@/lib/content/posts";
 import { Timeline } from "@/components/Timeline";
+import { buildMetadata } from "@/lib/metadata";
 
 export function generateStaticParams() {
   return getAllTags().map(({ tag }) => ({ tag }));
+}
+
+export function generateMetadata({ params }: { params: { tag: string } }) {
+  const posts = getPostsByTag(params.tag);
+
+  return buildMetadata({
+    title: `Posts tagged "${params.tag}"`,
+    description: `${posts.length} post${posts.length === 1 ? "" : "s"} tagged "${params.tag}" on Sh3ll-M.`,
+    path: `/blog/tags/${params.tag}`,
+  });
 }
 
 export default function BlogTagPage({ params }: { params: { tag: string } }) {
