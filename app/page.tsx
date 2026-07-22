@@ -1,10 +1,10 @@
 import { getAllPosts } from "@/lib/content/posts";
 import { Timeline } from "@/components/Timeline";
 import { Hero } from "@/components/Hero";
-import { buildMetadata } from "@/lib/metadata";
+import { buildMetadata, SITE_NAME } from "@/lib/metadata";
 
 export const metadata = buildMetadata({
-  title: "Home",
+  title: SITE_NAME,
   description: "Recent posts and projects from Sh3ll-M, presented as a git commit log.",
   path: "/",
 });

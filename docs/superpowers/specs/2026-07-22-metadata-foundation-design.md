@@ -9,7 +9,7 @@
 - Every page has a meaningful `<title>` and meta description.
 - A sitewide title template so post/project pages read as `"<Post Title> | Sh3ll-M"`.
 - `app/sitemap.ts` and `app/robots.ts` so the site is properly crawlable and discoverable.
-- Canonical URLs per page (via `alternates.url`) to avoid duplicate-content ambiguity.
+- Canonical URLs per page (via `alternates.canonical`) to avoid duplicate-content ambiguity.
 
 ## Non-goals
 
@@ -29,7 +29,7 @@ Matthew's real name will appear on the CV page (functionally required there), bu
 buildMetadata({ title, description, path }: { title: string; description: string; path: string }): Metadata
 ```
 
-Returns a `Metadata` object with `title`, `description`, `alternates: { canonical: new URL(path, SITE_URL).toString() }`, and `openGraph: { title, description, url: path }`. Centralizing this avoids repeating the canonical-URL-building and OG-field logic across 9 route files, following this repo's existing pattern of small single-purpose `lib/` helpers (`lib/site.ts`, `lib/content/*`).
+Returns a `Metadata` object with `title`, `description`, `alternates: { canonical: new URL(path, SITE_URL).toString() }`, and `openGraph: { title, description, url }` (the same absolute `url`, not the relative `path`). Centralizing this avoids repeating the canonical-URL-building and OG-field logic across 9 route files, following this repo's existing pattern of small single-purpose `lib/` helpers (`lib/site.ts`, `lib/content/*`).
 
 **Root layout (`app/layout.tsx`):** add to the existing `metadata` export:
 

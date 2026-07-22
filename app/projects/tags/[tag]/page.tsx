@@ -14,7 +14,7 @@ export function generateMetadata({ params }: { params: { tag: string } }) {
   return buildMetadata({
     title: `Projects tagged "${params.tag}"`,
     description: `${projects.length} project${projects.length === 1 ? "" : "s"} tagged "${params.tag}" on Sh3ll-M.`,
-    path: `/projects/tags/${params.tag}`,
+    path: `/projects/tags/${encodeURIComponent(params.tag)}`,
   });
 }
 
