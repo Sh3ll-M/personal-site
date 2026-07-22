@@ -29,7 +29,7 @@ Matthew's real name will appear on the CV page (functionally required there), bu
 buildMetadata({ title, description, path }: { title: string; description: string; path: string }): Metadata
 ```
 
-Returns a `Metadata` object with `title`, `description`, `alternates: { canonical: new URL(path, SITE_URL).toString() }`, and `openGraph: { title, description, url }` (the same absolute `url`, not the relative `path`). Centralizing this avoids repeating the canonical-URL-building and OG-field logic across 9 route files, following this repo's existing pattern of small single-purpose `lib/` helpers (`lib/site.ts`, `lib/content/*`).
+Returns a `Metadata` object with `title`, `description`, `alternates: { canonical: new URL(path, SITE_URL).toString() }`, and `openGraph: { title, description, url }` (the same absolute `url`, not the relative `path`). Centralizing this avoids repeating the canonical-URL-building and OG-field logic across 10 route files, following this repo's existing pattern of small single-purpose `lib/` helpers (`lib/site.ts`, `lib/content/*`).
 
 **Root layout (`app/layout.tsx`):** add to the existing `metadata` export:
 
