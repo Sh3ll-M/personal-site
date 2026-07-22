@@ -1,9 +1,28 @@
 import { notFound } from "next/navigation";
 import { getAllProjects, getProjectBySlug } from "@/lib/content/projects";
 import { PostMarkdown } from "@/lib/content/markdown";
+import { buildMetadata } from "@/lib/metadata";
 
 export function generateStaticParams() {
   return getAllProjects().map((project) => ({ slug: project.slug }));
+}
+
+export function generateMetadata({ params }: { params: { slug: string } }) {
+  const project = getProjectBySlug(params.slug);
+
+  if (!project) {
+    return buildMetadata({
+      title: "Not Found",
+      description: "This project doesn't exist.",
+      path: `/projects/${params.slug}`,
+    });
+  }
+
+  return buildMetadata({
+    title: project.title,
+    description: project.excerpt,
+    path: `/projects/${project.slug}`,
+  });
 }
 
 export default function ProjectPage({ params }: { params: { slug: string } }) {
