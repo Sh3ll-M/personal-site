@@ -64,7 +64,7 @@
 .prose-content pre {
   font-family: var(--font-body);
   background: var(--color-sidebar);
-  padding: 1em;
+  padding: 2.5em 1em 1em;
   border-radius: 0.375em;
   overflow-x: auto;
   margin-bottom: 1em;
@@ -98,8 +98,8 @@ figure[data-rehype-pretty-code-figure] {
 .prose-content pre[data-language]::before {
   content: attr(data-language);
   position: absolute;
-  top: 0.5em;
-  left: 0.5em;
+  top: 0.9em;
+  left: 1em;
   font-family: var(--font-mono);
   font-size: 0.75rem;
   color: var(--color-muted);
@@ -132,8 +132,8 @@ figure[data-rehype-pretty-code-figure] {
 
 .code-copy-button {
   position: absolute;
-  top: 0.5em;
-  right: 3.5em;
+  top: 0.75em;
+  right: 1em;
   font-family: var(--font-mono);
   font-size: 0.75rem;
   color: var(--color-muted);
