@@ -37,6 +37,11 @@
 .prose-content ol {
   margin-left: 1.5em;
   margin-bottom: 1em;
+  list-style: disc;
+}
+
+.prose-content ol {
+  list-style: decimal;
 }
 
 .prose-content li {
@@ -49,7 +54,7 @@
 }
 
 .prose-content code {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   background: var(--color-sidebar);
   padding: 0.1em 0.3em;
   border-radius: 0.25em;
@@ -57,7 +62,7 @@
 }
 
 .prose-content pre {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   background: var(--color-sidebar);
   padding: 1em;
   border-radius: 0.375em;
@@ -94,7 +99,7 @@ figure[data-rehype-pretty-code-figure] {
   content: attr(data-language);
   position: absolute;
   top: 0.5em;
-  right: 0.5em;
+  left: 0.5em;
   font-family: var(--font-mono);
   font-size: 0.75rem;
   color: var(--color-muted);
