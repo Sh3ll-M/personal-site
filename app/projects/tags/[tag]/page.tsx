@@ -29,7 +29,11 @@ export default function ProjectTagPage({ params }: { params: { tag: string } }) 
     <div>
       <h1 className="font-display text-2xl font-bold text-ink">
         Projects tagged{" "}
-        <Link href="/projects" className="text-diff-add hover:underline" title="Clear filter">
+        <Link
+          href="/projects"
+          className="text-diff-add hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-diff-add focus-visible:ring-offset-2 focus-visible:ring-offset-bg rounded-sm"
+          title="Clear filter"
+        >
           {params.tag}
         </Link>
       </h1>

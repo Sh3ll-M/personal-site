@@ -41,7 +41,10 @@ export function TimelineEntry({
         {date} &nbsp;{hash} &nbsp;
         <span className="text-diff-add">+{added}</span> <span className="text-diff-remove">-{removed}</span>
       </div>
-      <Link href={href} className="mt-1 block font-display text-lg font-bold text-ink hover:underline">
+      <Link
+        href={href}
+        className="mt-1 block font-display text-lg font-bold text-ink hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-diff-add focus-visible:ring-offset-2 focus-visible:ring-offset-bg rounded-sm"
+      >
         {title}
       </Link>
       <p className="mt-1 text-sm text-muted">{excerpt}</p>
@@ -51,7 +54,7 @@ export function TimelineEntry({
             <Link
               key={tag}
               href={`${tagsBasePath}/${tag}`}
-              className="rounded border border-rule px-2 py-0.5 hover:border-diff-add hover:text-ink"
+              className="rounded border border-rule px-2 py-0.5 hover:border-diff-add hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-diff-add focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
             >
               {tag}
             </Link>

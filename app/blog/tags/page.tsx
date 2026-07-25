@@ -19,7 +19,7 @@ export default function BlogTagsPage() {
           <li key={tag}>
             <Link
               href={`/blog/tags/${tag}`}
-              className="rounded border border-rule px-3 py-1 text-muted hover:border-diff-add hover:text-ink"
+              className="rounded border border-rule px-3 py-1 text-muted hover:border-diff-add hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-diff-add focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
             >
               {tag} <span className="text-muted">({count})</span>
             </Link>
