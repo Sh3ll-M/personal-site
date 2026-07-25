@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { getAllProjects, getProjectBySlug } from "@/lib/content/projects";
+import { getPostsByTags } from "@/lib/content/posts";
 import { PostMarkdown } from "@/lib/content/markdown";
+import { Timeline } from "@/components/Timeline";
 import { buildMetadata } from "@/lib/metadata";
 
 export function generateStaticParams() {
@@ -32,6 +34,8 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
     notFound();
   }
 
+  const relatedPosts = getPostsByTags(project.tags);
+
   return (
     <article>
       <div className="font-mono text-xs text-muted">
@@ -55,6 +59,16 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
       <div className="prose-content mt-6 text-ink">
         <PostMarkdown content={project.content} />
       </div>
+      <section className="mt-10">
+        <h2 className="font-mono text-xs uppercase tracking-wide text-muted">Related posts</h2>
+        {relatedPosts.length > 0 ? (
+          <div className="mt-4">
+            <Timeline items={relatedPosts} basePath="/blog" />
+          </div>
+        ) : (
+          <p className="mt-3 text-sm text-muted">No posts yet — check back soon.</p>
+        )}
+      </section>
     </article>
   );
 }
