@@ -6,7 +6,6 @@ import { getAllProjects, type Project } from "@/lib/content/projects";
 export function buildSitemap(posts: Post[], projects: Project[]): MetadataRoute.Sitemap {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${SITE_URL}/` },
-    { url: `${SITE_URL}/cv` },
     { url: `${SITE_URL}/blog` },
     { url: `${SITE_URL}/projects` },
   ];

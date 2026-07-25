@@ -19,7 +19,6 @@ describe("buildSitemap", () => {
     expect(urls).toEqual(
       expect.arrayContaining([
         "https://personal-site-ecru-eta-23.vercel.app/",
-        "https://personal-site-ecru-eta-23.vercel.app/cv",
         "https://personal-site-ecru-eta-23.vercel.app/blog",
         "https://personal-site-ecru-eta-23.vercel.app/projects",
       ])

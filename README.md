@@ -1,6 +1,6 @@
 # personal-site
 
-Matthew's personal site — CV, blog, and projects, styled around the idea that the
+Matthew's personal site — blog and projects, styled around the idea that the
 whole thing is basically git you can read: each post and project renders as a
 "commit" with a real hash and diffstat pulled from this repo's own history, laid
 out as a vertical timeline.
@@ -11,8 +11,6 @@ out as a vertical timeline.
 - **Blog** (`/blog`) — full timeline of posts, each entry showing a real commit
   hash + diffstat derived from that post's git history
 - **Projects** (`/projects`) — portfolio grid, same git-flavored detail pages
-- **CV** (`/cv`) — on-page resume (currently placeholder content — swap in the
-  real thing before sharing this link around)
 - **404** — a git-themed not-found page
 
 ## Stack
