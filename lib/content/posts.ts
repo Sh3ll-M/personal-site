@@ -68,3 +68,7 @@ export function getAllTags(posts: Post[] = getAllPosts()): TagCount[] {
 export function getPostsByTag(tag: string, posts: Post[] = getAllPosts()): Post[] {
   return posts.filter((post) => post.tags.includes(tag));
 }
+
+export function getPostsByTags(tags: string[], posts: Post[] = getAllPosts()): Post[] {
+  return posts.filter((post) => post.tags.some((tag) => tags.includes(tag)));
+}

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getAllPosts, getPostBySlug, getAllTags, getPostsByTag, type Post } from "./posts";
+import { getAllPosts, getPostBySlug, getAllTags, getPostsByTag, getPostsByTags, type Post } from "./posts";
 
 const fakeGitMeta = () => ({ hash: "abc123", date: "2026-07-01", added: 10, removed: 0 });
 
@@ -78,5 +78,26 @@ describe("getPostsByTag", () => {
 
   it("returns an empty array for an unknown tag", () => {
     expect(getPostsByTag("nonexistent", fakePosts)).toEqual([]);
+  });
+});
+
+describe("getPostsByTags", () => {
+  it("returns posts that share at least one tag with the given list", () => {
+    expect(getPostsByTags(["meta"], fakePosts).map((p) => p.slug)).toEqual(["a-post"]);
+  });
+
+  it("returns posts matching any of several tags, no duplicates", () => {
+    expect(getPostsByTags(["git", "meta"], fakePosts).map((p) => p.slug)).toEqual([
+      "a-post",
+      "b-post",
+    ]);
+  });
+
+  it("returns an empty array when no post matches any given tag", () => {
+    expect(getPostsByTags(["nonexistent"], fakePosts)).toEqual([]);
+  });
+
+  it("returns an empty array when given an empty tag list", () => {
+    expect(getPostsByTags([], fakePosts)).toEqual([]);
   });
 });
