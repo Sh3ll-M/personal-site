@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ContactIcons } from "@/components/ContactIcons";
 
 const NAV_ITEMS = [
   { href: "/", label: "home" },
@@ -9,7 +10,7 @@ const NAV_ITEMS = [
 
 export function Sidebar() {
   return (
-    <aside className="w-full shrink-0 border-b border-rule bg-sidebar px-6 py-5 md:w-56 md:border-b-0 md:border-r md:py-8">
+    <aside className="w-full shrink-0 border-b border-rule bg-sidebar px-6 py-5 md:flex md:w-56 md:flex-col md:border-b-0 md:border-r md:py-8">
       <div className="font-display text-xl font-bold text-ink">Matthew</div>
       <div className="mt-1 font-mono text-xs text-muted">builds &amp; breaks things</div>
       <nav className="mt-6 flex gap-4 font-mono text-sm text-muted md:mt-8 md:flex-col md:gap-3">
@@ -19,6 +20,9 @@ export function Sidebar() {
           </Link>
         ))}
       </nav>
+      <div className="mt-4 md:mt-auto md:pt-8">
+        <ContactIcons />
+      </div>
     </aside>
   );
 }
