@@ -14,7 +14,8 @@ const FOCUS_RING_CLASSES =
 
 export function TagChip({ tag, href, count, className = "" }: TagChipProps) {
   const style = { "--tag-color": getTagColor(tag) } as CSSProperties;
-  const baseClasses = `rounded border border-[var(--tag-color)] text-[var(--tag-color)] hover:border-diff-add hover:text-ink ${className}`;
+  const colorClasses = `rounded border border-[var(--tag-color)] text-[var(--tag-color)] ${className}`;
+  const hoverClasses = "hover:border-diff-add hover:text-ink";
 
   const content = (
     <>
@@ -25,14 +26,14 @@ export function TagChip({ tag, href, count, className = "" }: TagChipProps) {
 
   if (href) {
     return (
-      <Link href={href} style={style} className={`${baseClasses} ${FOCUS_RING_CLASSES}`}>
+      <Link href={href} style={style} className={`${colorClasses} ${hoverClasses} ${FOCUS_RING_CLASSES}`}>
         {content}
       </Link>
     );
   }
 
   return (
-    <span style={style} className={baseClasses}>
+    <span style={style} className={colorClasses}>
       {content}
     </span>
   );
