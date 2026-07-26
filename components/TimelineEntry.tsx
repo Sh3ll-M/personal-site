@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
+import { TagChip } from "./TagChip";
 
 type TimelineEntryProps = {
   href: string;
@@ -49,15 +50,9 @@ export function TimelineEntry({
       </Link>
       <p className="mt-1 text-sm text-muted">{excerpt}</p>
       {tags && tags.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-2 font-mono text-xs text-muted">
+        <div className="mt-2 flex flex-wrap gap-2 font-mono text-xs">
           {tags.map((tag) => (
-            <Link
-              key={tag}
-              href={`${tagsBasePath}/${tag}`}
-              className="rounded border border-rule px-2 py-0.5 hover:border-diff-add hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-diff-add focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
-            >
-              {tag}
-            </Link>
+            <TagChip key={tag} tag={tag} href={`${tagsBasePath}/${tag}`} className="px-2 py-0.5" />
           ))}
         </div>
       )}

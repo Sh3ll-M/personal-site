@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { TagChip } from "@/components/TagChip";
 import { getAllTags } from "@/lib/content/posts";
 import { buildMetadata } from "@/lib/metadata";
 
@@ -17,12 +17,7 @@ export default function BlogTagsPage() {
       <ul className="mt-6 flex flex-wrap gap-3 font-mono text-sm">
         {tags.map(({ tag, count }) => (
           <li key={tag}>
-            <Link
-              href={`/blog/tags/${tag}`}
-              className="rounded border border-rule px-3 py-1 text-muted hover:border-diff-add hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-diff-add focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
-            >
-              {tag} <span className="text-muted">({count})</span>
-            </Link>
+            <TagChip tag={tag} href={`/blog/tags/${tag}`} count={count} className="px-3 py-1" />
           </li>
         ))}
       </ul>
