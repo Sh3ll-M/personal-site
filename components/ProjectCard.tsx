@@ -6,9 +6,10 @@ type ProjectCardProps = {
   title: string;
   excerpt: string;
   tags: string[];
+  allTags: string[];
 };
 
-export function ProjectCard({ slug, title, excerpt, tags }: ProjectCardProps) {
+export function ProjectCard({ slug, title, excerpt, tags, allTags }: ProjectCardProps) {
   return (
     <Link
       href={`/projects/${slug}`}
@@ -19,7 +20,7 @@ export function ProjectCard({ slug, title, excerpt, tags }: ProjectCardProps) {
       {tags.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2 font-mono text-xs">
           {tags.map((tag) => (
-            <TagChip key={tag} tag={tag} className="px-2 py-0.5" />
+            <TagChip key={tag} tag={tag} allTags={allTags} className="px-2 py-0.5" />
           ))}
         </div>
       )}

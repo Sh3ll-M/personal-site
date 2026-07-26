@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllPosts, getPostBySlug, getAdjacentPosts, getPostsByTags } from "@/lib/content/posts";
+import { getAllSiteTags } from "@/lib/content/tags";
 import { PostMarkdown } from "@/lib/content/markdown";
 import { Timeline } from "@/components/Timeline";
 import { buildMetadata } from "@/lib/metadata";
@@ -37,6 +38,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
 
   const { previous, next } = getAdjacentPosts(post.slug, posts);
   const relatedPosts = getPostsByTags(post.tags, posts).filter((p) => p.slug !== post.slug);
+  const allTags = getAllSiteTags();
 
   return (
     <article>
@@ -74,7 +76,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
         <section className="mt-10">
           <h2 className="font-mono text-xs uppercase tracking-wide text-muted">Related posts</h2>
           <div className="mt-4">
-            <Timeline items={relatedPosts} basePath="/blog" />
+            <Timeline items={relatedPosts} basePath="/blog" allTags={allTags} />
           </div>
         </section>
       )}

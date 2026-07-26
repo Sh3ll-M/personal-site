@@ -1,5 +1,6 @@
 import { TagChip } from "@/components/TagChip";
 import { getAllProjectTags } from "@/lib/content/projects";
+import { getAllSiteTags } from "@/lib/content/tags";
 import { buildMetadata } from "@/lib/metadata";
 
 export const metadata = buildMetadata({
@@ -10,6 +11,7 @@ export const metadata = buildMetadata({
 
 export default function ProjectTagsPage() {
   const tags = getAllProjectTags();
+  const allTags = getAllSiteTags();
 
   return (
     <div>
@@ -17,7 +19,7 @@ export default function ProjectTagsPage() {
       <ul className="mt-6 flex flex-wrap gap-3 font-mono text-sm">
         {tags.map(({ tag, count }) => (
           <li key={tag}>
-            <TagChip tag={tag} href={`/projects/tags/${tag}`} count={count} className="px-3 py-1" />
+            <TagChip tag={tag} allTags={allTags} href={`/projects/tags/${tag}`} count={count} className="px-3 py-1" />
           </li>
         ))}
       </ul>

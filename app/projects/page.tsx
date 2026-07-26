@@ -1,4 +1,5 @@
 import { getAllProjects } from "@/lib/content/projects";
+import { getAllSiteTags } from "@/lib/content/tags";
 import { ProjectCard } from "@/components/ProjectCard";
 import { buildMetadata } from "@/lib/metadata";
 
@@ -10,6 +11,7 @@ export const metadata = buildMetadata({
 
 export default function ProjectsPage() {
   const projects = getAllProjects();
+  const allTags = getAllSiteTags();
 
   return (
     <div>
@@ -22,6 +24,7 @@ export default function ProjectsPage() {
             title={project.title}
             excerpt={project.excerpt}
             tags={project.tags}
+            allTags={allTags}
           />
         ))}
       </div>

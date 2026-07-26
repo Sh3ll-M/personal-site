@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllProjectTags, getProjectsByTag } from "@/lib/content/projects";
+import { getAllSiteTags } from "@/lib/content/tags";
 import { ProjectCard } from "@/components/ProjectCard";
 import { buildMetadata } from "@/lib/metadata";
 
@@ -25,6 +26,8 @@ export default function ProjectTagPage({ params }: { params: { tag: string } }) 
     notFound();
   }
 
+  const allTags = getAllSiteTags();
+
   return (
     <div>
       <h1 className="font-display text-2xl font-bold text-ink">
@@ -45,6 +48,7 @@ export default function ProjectTagPage({ params }: { params: { tag: string } }) 
             title={project.title}
             excerpt={project.excerpt}
             tags={project.tags}
+            allTags={allTags}
           />
         ))}
       </div>

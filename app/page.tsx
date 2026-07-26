@@ -1,4 +1,5 @@
 import { getAllPosts } from "@/lib/content/posts";
+import { getAllSiteTags } from "@/lib/content/tags";
 import { Timeline } from "@/components/Timeline";
 import { Hero } from "@/components/Hero";
 import { buildMetadata, SITE_NAME } from "@/lib/metadata";
@@ -11,6 +12,7 @@ export const metadata = buildMetadata({
 
 export default function HomePage() {
   const recentPosts = getAllPosts().slice(0, 3);
+  const allTags = getAllSiteTags();
 
   return (
     <div>
@@ -18,7 +20,7 @@ export default function HomePage() {
 
       <h2 className="mt-12 font-display text-sm uppercase tracking-wide text-muted">Recent</h2>
       <div className="mt-4">
-        <Timeline items={recentPosts} basePath="/blog" />
+        <Timeline items={recentPosts} basePath="/blog" allTags={allTags} />
       </div>
     </div>
   );

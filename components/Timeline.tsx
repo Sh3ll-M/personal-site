@@ -13,11 +13,13 @@ export function Timeline({
   items,
   basePath,
   tagsBasePath,
+  allTags,
 }: {
   items: TimelineItem[];
   basePath: string;
   /** Base path for tag chip links, e.g. "/blog/tags". Defaults to `${basePath}/tags`. */
   tagsBasePath?: string;
+  allTags: string[];
 }) {
   const resolvedTagsBasePath = tagsBasePath ?? `${basePath}/tags`;
 
@@ -35,6 +37,7 @@ export function Timeline({
           excerpt={item.excerpt}
           tags={item.tags}
           tagsBasePath={resolvedTagsBasePath}
+          allTags={allTags}
         />
       ))}
     </ul>

@@ -14,6 +14,7 @@ type TimelineEntryProps = {
   excerpt: string;
   tags?: string[];
   tagsBasePath?: string;
+  allTags: string[];
 };
 
 export function TimelineEntry({
@@ -26,6 +27,7 @@ export function TimelineEntry({
   excerpt,
   tags,
   tagsBasePath = "/blog/tags",
+  allTags,
 }: TimelineEntryProps) {
   const reduceMotion = useReducedMotion();
 
@@ -52,7 +54,7 @@ export function TimelineEntry({
       {tags && tags.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-2 font-mono text-xs">
           {tags.map((tag) => (
-            <TagChip key={tag} tag={tag} href={`${tagsBasePath}/${tag}`} className="px-2 py-0.5" />
+            <TagChip key={tag} tag={tag} allTags={allTags} href={`${tagsBasePath}/${tag}`} className="px-2 py-0.5" />
           ))}
         </div>
       )}

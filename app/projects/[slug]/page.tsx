@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getAllProjects, getProjectBySlug } from "@/lib/content/projects";
 import { getPostsByTags } from "@/lib/content/posts";
+import { getAllSiteTags } from "@/lib/content/tags";
 import { PostMarkdown } from "@/lib/content/markdown";
 import { Timeline } from "@/components/Timeline";
 import { buildMetadata } from "@/lib/metadata";
@@ -35,6 +36,7 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
   }
 
   const relatedPosts = getPostsByTags(project.tags);
+  const allTags = getAllSiteTags();
 
   return (
     <article>
@@ -63,7 +65,7 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
         <h2 className="font-mono text-xs uppercase tracking-wide text-muted">Related posts</h2>
         {relatedPosts.length > 0 ? (
           <div className="mt-4">
-            <Timeline items={relatedPosts} basePath="/blog" />
+            <Timeline items={relatedPosts} basePath="/blog" allTags={allTags} />
           </div>
         ) : (
           <p className="mt-3 text-sm text-muted">No posts yet — check back soon.</p>
