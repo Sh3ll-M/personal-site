@@ -20,6 +20,8 @@ Tag chips currently render identically everywhere they appear — a plain muted-
 
 ## Palette & color assignment
 
+**Superseded by the Revision section below** — see "Revision: guaranteed uniqueness".
+
 `lib/tagColors.ts` exports:
 
 ```ts

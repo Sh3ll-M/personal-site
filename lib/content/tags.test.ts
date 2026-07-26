@@ -17,4 +17,8 @@ describe("getAllSiteTags", () => {
   it("returns an empty array when there are no tags anywhere", () => {
     expect(getAllSiteTags([], [])).toEqual([]);
   });
+
+  it("keeps the real site's tag count within the 10-color palette capacity", () => {
+    expect(getAllSiteTags().length).toBeLessThanOrEqual(10);
+  });
 });

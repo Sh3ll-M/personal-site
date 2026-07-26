@@ -11,10 +11,16 @@ const PALETTE = [
   "#6bafc7", // harbor
 ] as const;
 
+// Special-cased tags still occupy a slot in the alphabetical index count below
+// (they just never render that indexed palette color), so effective palette
+// capacity is reduced by however many entries are listed here.
 const SPECIAL_TAG_COLORS: Record<string, string> = {
   meta: "#e8e6e1",
 };
 
+// Colors are assigned by alphabetical index into allTags, not pinned to a tag
+// name — adding a new tag earlier in the alphabet shifts every subsequent
+// tag's color.
 export function getTagColor(tag: string, allTags: string[]): string {
   if (tag in SPECIAL_TAG_COLORS) {
     return SPECIAL_TAG_COLORS[tag];

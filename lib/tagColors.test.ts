@@ -36,4 +36,31 @@ describe("getTagColor", () => {
   it("does not throw for a tag missing from allTags", () => {
     expect(() => getTagColor("unknown-tag", REAL_TAGS)).not.toThrow();
   });
+
+  it("assigns palette colors in the documented order, by alphabetical position", () => {
+    const alphabeticalTags = [
+      "a-tag",
+      "b-tag",
+      "c-tag",
+      "d-tag",
+      "e-tag",
+      "f-tag",
+      "g-tag",
+      "h-tag",
+      "i-tag",
+      "j-tag",
+    ];
+    expect(alphabeticalTags.map((tag) => getTagColor(tag, alphabeticalTags))).toEqual([
+      "#d9a44a",
+      "#5fb8b0",
+      "#9d8cd9",
+      "#6a9fd8",
+      "#d98a9e",
+      "#8f97c9",
+      "#c2ca73",
+      "#c98860",
+      "#b57fc4",
+      "#6bafc7",
+    ]);
+  });
 });
