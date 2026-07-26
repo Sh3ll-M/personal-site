@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SITE_URL } from "./site";
 
 export const SITE_NAME = "Sh3ll-M";
+export const SITE_DESCRIPTION = "Sh3ll-M — CV, blog posts, and project write-ups, rendered as a git commit log.";
 
 export function buildMetadata({
   title,
