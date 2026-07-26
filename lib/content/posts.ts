@@ -72,3 +72,17 @@ export function getPostsByTag(tag: string, posts: Post[] = getAllPosts()): Post[
 export function getPostsByTags(tags: string[], posts: Post[] = getAllPosts()): Post[] {
   return posts.filter((post) => post.tags.some((tag) => tags.includes(tag)));
 }
+
+export function getAdjacentPosts(
+  slug: string,
+  posts: Post[] = getAllPosts()
+): { previous?: Post; next?: Post } {
+  const index = posts.findIndex((post) => post.slug === slug);
+  if (index === -1) {
+    return {};
+  }
+  return {
+    previous: posts[index + 1],
+    next: index > 0 ? posts[index - 1] : undefined,
+  };
+}

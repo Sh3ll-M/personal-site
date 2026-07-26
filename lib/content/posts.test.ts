@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getAllPosts, getPostBySlug, getAllTags, getPostsByTag, getPostsByTags, type Post } from "./posts";
+import { getAllPosts, getPostBySlug, getAllTags, getPostsByTag, getPostsByTags, getAdjacentPosts, type Post } from "./posts";
 
 const fakeGitMeta = () => ({ hash: "abc123", date: "2026-07-01", added: 10, removed: 0 });
 
@@ -41,9 +41,9 @@ describe("getPostBySlug", () => {
 const fakeGit = { hash: "abc123", date: "2026-07-01", added: 10, removed: 0 };
 
 const fakePosts: Post[] = [
-  { slug: "a-post", title: "A Post", date: "2026-07-01", tags: ["git", "meta"], excerpt: "A", content: "", git: fakeGit },
-  { slug: "b-post", title: "B Post", date: "2026-07-15", tags: ["git"], excerpt: "B", content: "", git: fakeGit },
   { slug: "c-post", title: "C Post", date: "2026-07-20", tags: [], excerpt: "C", content: "", git: fakeGit },
+  { slug: "b-post", title: "B Post", date: "2026-07-15", tags: ["git"], excerpt: "B", content: "", git: fakeGit },
+  { slug: "a-post", title: "A Post", date: "2026-07-01", tags: ["git", "meta"], excerpt: "A", content: "", git: fakeGit },
 ];
 
 describe("getAllTags", () => {
@@ -73,7 +73,7 @@ describe("getPostsByTag", () => {
   });
 
   it("returns posts for a tag shared by multiple posts", () => {
-    expect(getPostsByTag("git", fakePosts).map((p) => p.slug)).toEqual(["a-post", "b-post"]);
+    expect(getPostsByTag("git", fakePosts).map((p) => p.slug)).toEqual(["b-post", "a-post"]);
   });
 
   it("returns an empty array for an unknown tag", () => {
@@ -88,8 +88,8 @@ describe("getPostsByTags", () => {
 
   it("returns posts matching any of several tags, no duplicates", () => {
     expect(getPostsByTags(["git", "meta"], fakePosts).map((p) => p.slug)).toEqual([
-      "a-post",
       "b-post",
+      "a-post",
     ]);
   });
 
@@ -99,5 +99,31 @@ describe("getPostsByTags", () => {
 
   it("returns an empty array when given an empty tag list", () => {
     expect(getPostsByTags([], fakePosts)).toEqual([]);
+  });
+});
+
+describe("getAdjacentPosts", () => {
+  it("returns both neighbors for a post in the middle", () => {
+    const result = getAdjacentPosts("b-post", fakePosts);
+    expect(result.previous?.slug).toBe("a-post");
+    expect(result.next?.slug).toBe("c-post");
+  });
+
+  it("returns no `next` for the newest post", () => {
+    const result = getAdjacentPosts("c-post", fakePosts);
+    expect(result.next).toBeUndefined();
+    expect(result.previous?.slug).toBe("b-post");
+  });
+
+  it("returns no `previous` for the oldest post", () => {
+    const result = getAdjacentPosts("a-post", fakePosts);
+    expect(result.previous).toBeUndefined();
+    expect(result.next?.slug).toBe("b-post");
+  });
+
+  it("returns neither neighbor when there is only one post", () => {
+    const result = getAdjacentPosts("a-post", [fakePosts[0]]);
+    expect(result.previous).toBeUndefined();
+    expect(result.next).toBeUndefined();
   });
 });
