@@ -69,3 +69,34 @@ Each file's existing focus-ring classes on the chip move into `TagChip` itself (
 ## Testing
 
 `lib/tagColors.test.ts`: `getTagColor` is deterministic (same tag input twice returns the same color) and always returns a value present in the exported palette. No new tests for `TagChip` itself — presentational-only, consistent with this repo's existing precedent (see prior specs) of not testing static/interactive-but-logic-free markup beyond what build + typecheck already cover.
+
+## Revision: guaranteed uniqueness (same session, before merge)
+
+After seeing the shipped hash-based palette live, Matthew noticed `n8n` and `necromunda` collided (both landed on the same hash bucket) and asked for every tag to be visually distinct — reversing the "colors may cycle/collide once tags exceed the palette" trade-off accepted above. This section supersedes the hash-based parts of "Palette & color assignment" above; the rest of the design (treatment, hover behavior, `TagChip`'s rendering modes, integration call sites) is unchanged.
+
+**New trade-off, confirmed with Matthew:** uniqueness requires knowing every tag on the site, not just hashing one tag name in isolation — so "zero maintenance forever" no longer holds. Once distinct tags exceed the palette size, a new color needs adding by hand. Accepted as worthwhile for guaranteed-unique colors today.
+
+**Expanded palette (10 colors, 6 unchanged + 4 new)**, still excluding hues near the diff-add green (~152°) and diff-remove red (~4°):
+
+```ts
+const PALETTE = [
+  "#d9a44a", // amber (existing)
+  "#5fb8b0", // teal (existing)
+  "#9d8cd9", // violet (existing)
+  "#6a9fd8", // blue (existing)
+  "#d98a9e", // rose (existing)
+  "#8f97c9", // slate (existing)
+  "#c2ca73", // citrine (new)
+  "#c98860", // clay (new)
+  "#b57fc4", // orchid (new)
+  "#6bafc7", // harbor (new, spare headroom beyond today's 9 tags)
+] as const;
+```
+
+**Assignment changes from a per-string hash to a global alphabetical index.** `getTagColor(tag: string, allTags: string[]): string` sorts `allTags` (deduplicated), finds `tag`'s index in that sorted list, and returns `PALETTE[index % PALETTE.length]`. This guarantees uniqueness as long as the total distinct tag count doesn't exceed the palette size (10 today, for 9 actual tags). `allTags` must be the *complete* site-wide tag universe every time — a per-page or per-content-type subset would misassign colors — so a new `getAllSiteTags(): string[]` (in `lib/content/tags.ts`, merging `getAllTags()` from `lib/content/posts.ts` and `getAllProjectTags()` from `lib/content/projects.ts`, deduplicated) becomes the single source of truth, computed once per page render and threaded down to every chip.
+
+**One deliberate manual exception: `meta`.** Matthew asked for the `meta` tag specifically to render in the site's own ink/white color (`#e8e6e1`, the same token used for headings and body text) rather than a rotating hue — it marks posts about the site itself, not a topic, so it reads better as a neutral/system marker. `getTagColor` checks a small fixed override (`{ meta: "#e8e6e1" }`) before falling through to the palette-by-index logic. This is a narrow, named exception for one specific tag with a stated semantic reason, not a return to general per-tag manual mapping (which remains rejected for every other tag, per the original Non-goals).
+
+**Why this needs a bigger refactor than "just change the palette":** tag chips render inside `TimelineEntry`, a `"use client"` component (needed for its framer-motion fade-in animation). Client components can't import the content-loading functions in `lib/content/posts.ts`/`lib/content/projects.ts` (they use Node's `fs`/`child_process`, which can't be bundled for the browser). So `getAllSiteTags()` can only ever be called server-side, in each page component — it cannot be called from inside `TagChip` itself. The site-wide tag list has to be computed once per page and passed down as a plain string-array prop through `Timeline` → `TimelineEntry` → `TagChip`, and through `ProjectCard` → `TagChip`, to every one of the 9 page files that render a `Timeline`, `ProjectCard`, or `TagChip` directly (`app/page.tsx`, `app/blog/page.tsx`, `app/blog/[slug]/page.tsx`, `app/blog/tags/page.tsx`, `app/blog/tags/[tag]/page.tsx`, `app/projects/page.tsx`, `app/projects/[slug]/page.tsx`, `app/projects/tags/page.tsx`, `app/projects/tags/[tag]/page.tsx`). `lib/tagColors.ts` itself stays pure (no `fs`/`child_process`), so it's safe to keep importing directly into the client-bundled `TagChip`/`TimelineEntry` — only the *tag enumeration* is server-only, not the color math.
+
+**Confirmed via the visual companion:** the expanded palette (all 10 swatches) and the corrected `n8n`/`necromunda` pair (now blue/rose) were shown as chip mockups against real post/project titles before being locked in; the `meta`-in-white treatment was shown as a follow-up mockup and approved separately.
