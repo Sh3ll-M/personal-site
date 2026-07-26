@@ -58,4 +58,15 @@ describe("buildRssFeed", () => {
     const xml = buildRssFeed(fakePosts);
     expect(xml).toContain(`<pubDate>${new Date("2026-07-01T00:00:00Z").toUTCString()}</pubDate>`);
   });
+
+  it("falls back to the current date instead of emitting 'Invalid Date' for an invalid calendar date", () => {
+    const invalidDatePost: Post = {
+      ...fakePosts[0],
+      slug: "invalid-date-post",
+      date: "2026-13-45",
+    };
+    const xml = buildRssFeed([invalidDatePost]);
+    const pubDateMatch = xml.match(/<pubDate>(.*?)<\/pubDate>/);
+    expect(pubDateMatch?.[1]).not.toContain("Invalid");
+  });
 });

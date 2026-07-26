@@ -28,14 +28,15 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
 }
 
 export default function BlogPostPage({ params }: { params: { slug: string } }) {
-  const post = getPostBySlug(params.slug);
+  const posts = getAllPosts();
+  const post = posts.find((p) => p.slug === params.slug);
 
   if (!post) {
     notFound();
   }
 
-  const { previous, next } = getAdjacentPosts(post.slug);
-  const relatedPosts = getPostsByTags(post.tags).filter((p) => p.slug !== post.slug);
+  const { previous, next } = getAdjacentPosts(post.slug, posts);
+  const relatedPosts = getPostsByTags(post.tags, posts).filter((p) => p.slug !== post.slug);
 
   return (
     <article>
@@ -49,7 +50,10 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
         <PostMarkdown content={post.content} />
       </div>
       {(previous || next) && (
-        <nav className="mt-10 flex justify-between gap-4 font-mono text-sm text-diff-add">
+        <nav
+          aria-label="Post navigation"
+          className="mt-10 flex justify-between gap-4 font-mono text-sm text-diff-add"
+        >
           {previous ? (
             <Link href={`/blog/${previous.slug}`} className="hover:underline">
               ← {previous.title}

@@ -126,4 +126,9 @@ describe("getAdjacentPosts", () => {
     expect(result.previous).toBeUndefined();
     expect(result.next).toBeUndefined();
   });
+
+  it("returns neither neighbor for a slug that doesn't exist", () => {
+    const result = getAdjacentPosts("nonexistent-slug", fakePosts);
+    expect(result).toEqual({});
+  });
 });
