@@ -17,14 +17,11 @@ export function Hero() {
 
   return (
     <motion.div initial="hidden" animate="show" variants={container}>
-      <motion.div variants={item} className="font-mono text-xs text-muted">
-        ~/matthew
-      </motion.div>
-      <motion.h1 variants={item} className="mt-2 font-display text-4xl font-bold text-ink">
+      <motion.h1 variants={item} className="font-display text-4xl font-bold text-ink">
         Matthew.
       </motion.h1>
       <motion.p variants={item} className="mt-2 font-mono text-sm text-muted">
-        builds things. breaks things. writes it down.
+        builds things. breaks things.
       </motion.p>
     </motion.div>
   );
