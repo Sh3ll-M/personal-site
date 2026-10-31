@@ -3,7 +3,7 @@ title: "Orlock"
 date: "2026-08-03"
 faction: "House Orlock"
 coverPosition: "top"
-excerpt: "House Orlock — grit, steel and blue-collar muscle, led from the front by the gang boss."
+excerpt: "House Orlock: grit, steel and muscle, led from the front by the gang boss."
 tags: ["necromunda"]
 ---
 

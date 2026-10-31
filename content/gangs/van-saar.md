@@ -2,7 +2,7 @@
 title: "Van Saar"
 date: "2026-08-03"
 faction: "House Van Saar"
-excerpt: "My first Necromunda gang — teal armour, magenta hex bases, and a pair of Arachni-rigs looming over the crew."
+excerpt: "My first Necromunda gang: teal armour, magenta hex bases and a pair of Arachni-rigs looming over the crew."
 tags: ["necromunda"]
 ---
 
