@@ -4,7 +4,7 @@ import { buildMetadata } from "@/lib/metadata";
 
 export const metadata = buildMetadata({
   title: "Gallery",
-  description: "Painted miniatures — Necromunda gangs and other hobby projects.",
+  description: "Painted miniatures: Necromunda gangs and other hobby projects.",
   path: "/gallery",
 });
 
@@ -31,7 +31,7 @@ export default function GalleryPage() {
           ))}
         </div>
       ) : (
-        <p className="mt-6 text-sm text-muted">No gangs yet — check back soon.</p>
+        <p className="mt-6 text-sm text-muted">No gangs yet. Check back soon.</p>
       )}
     </div>
   );

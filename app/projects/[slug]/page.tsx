@@ -68,7 +68,7 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
             <Timeline items={relatedPosts} basePath="/blog" allTags={allTags} />
           </div>
         ) : (
-          <p className="mt-3 text-sm text-muted">No posts yet — check back soon.</p>
+          <p className="mt-3 text-sm text-muted">No posts yet. Check back soon.</p>
         )}
       </section>
     </article>

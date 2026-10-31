@@ -39,7 +39,7 @@ export function Gallery({ photos, title }: GalleryProps) {
   }, [isOpen, photos.length, close]);
 
   if (photos.length === 0) {
-    return <p className="mt-6 text-sm text-muted">No photos yet — check back soon.</p>;
+    return <p className="mt-6 text-sm text-muted">No photos yet. Check back soon.</p>;
   }
 
   return (
@@ -56,7 +56,7 @@ export function Gallery({ photos, title }: GalleryProps) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={photo.thumb}
-              alt={`${title} — photo ${i + 1}`}
+              alt={`${title}, photo ${i + 1}`}
               loading="lazy"
               className="block w-full"
             />
@@ -96,7 +96,7 @@ export function Gallery({ photos, title }: GalleryProps) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={photos[openIndex].full}
-            alt={`${title} — photo ${openIndex + 1}`}
+            alt={`${title}, photo ${openIndex + 1}`}
             onClick={(e) => e.stopPropagation()}
             className="max-h-[85vh] max-w-full rounded border border-rule object-contain"
           />
