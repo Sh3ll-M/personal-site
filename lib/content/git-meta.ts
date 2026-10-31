@@ -11,21 +11,52 @@ export type RunCommand = (command: string) => string;
 
 const defaultRun: RunCommand = (command) => execSync(command, { encoding: "utf-8" });
 
+type Commit = { hash: string; date: string; added: number; removed: number };
+
+// Sentinel prefix so we can reliably tell a commit header line apart from the
+// shortstat line that follows it.
+const HEADER = "__commit__";
+
+function parseLog(output: string): Commit[] {
+  const commits: Commit[] = [];
+  let current: Commit | null = null;
+
+  for (const line of output.split("\n")) {
+    if (line.startsWith(HEADER)) {
+      const [hash, date] = line.slice(HEADER.length).split(",");
+      current = { hash, date, added: 0, removed: 0 };
+      commits.push(current);
+    } else if (current) {
+      const insertMatch = line.match(/(\d+) insertion/);
+      const deleteMatch = line.match(/(\d+) deletion/);
+      if (insertMatch) current.added = Number(insertMatch[1]);
+      if (deleteMatch) current.removed = Number(deleteMatch[1]);
+    }
+  }
+
+  return commits;
+}
+
 export function getGitMetaForFile(filePath: string, run: RunCommand = defaultRun): GitMeta {
-  const log = run(`git log -1 --format=%h,%ad --date=short -- "${filePath}"`).trim();
-  if (!log) {
+  // --follow traces history across renames; the sentinel format plus --shortstat
+  // lets us read each commit's diffstat in one pass.
+  const output = run(
+    `git log --follow --format=${HEADER}%h,%ad --shortstat --date=short -- "${filePath}"`
+  );
+  const commits = parseLog(output);
+
+  if (commits.length === 0) {
     throw new Error(`No git history found for ${filePath}`);
   }
-  const [hash, date] = log.split(",");
 
-  const shortstat = run(`git log -1 --shortstat -- "${filePath}"`);
-  const insertMatch = shortstat.match(/(\d+) insertion/);
-  const deleteMatch = shortstat.match(/(\d+) deletion/);
+  // Prefer the most recent commit that actually changed the file's content, so a
+  // trivial commit (such as a pure rename) does not show up as "+0 -0".
+  const meaningful = commits.find((c) => c.added > 0 || c.removed > 0) ?? commits[0];
 
   return {
-    hash,
-    date,
-    added: insertMatch ? Number(insertMatch[1]) : 0,
-    removed: deleteMatch ? Number(deleteMatch[1]) : 0,
+    hash: meaningful.hash,
+    date: meaningful.date,
+    added: meaningful.added,
+    removed: meaningful.removed,
   };
 }

@@ -6,10 +6,11 @@ describe("getGitMetaForFile", () => {
     const calls: string[] = [];
     const fakeRun = (command: string) => {
       calls.push(command);
-      if (command.includes("--shortstat")) {
-        return " 1 file changed, 142 insertions(+), 8 deletions(-)\n";
-      }
-      return "a3f9c2,2026-07-12\n";
+      return (
+        "__commit__a3f9c2,2026-07-12\n" +
+        "\n" +
+        " 1 file changed, 142 insertions(+), 8 deletions(-)\n"
+      );
     };
 
     const meta = getGitMetaForFile("content/posts/hello.md", fakeRun);
@@ -19,13 +20,26 @@ describe("getGitMetaForFile", () => {
   });
 
   it("defaults added/removed to 0 when shortstat has no matching counts", () => {
-    const fakeRun = (command: string) =>
-      command.includes("--shortstat") ? " 1 file changed\n" : "1c88d4,2026-06-02\n";
+    const fakeRun = () => "__commit__1c88d4,2026-06-02\n\n 1 file changed\n";
 
     const meta = getGitMetaForFile("content/posts/new.md", fakeRun);
 
     expect(meta.added).toBe(0);
     expect(meta.removed).toBe(0);
+  });
+
+  it("skips a trivial commit and uses the most recent one that changed content", () => {
+    const fakeRun = () =>
+      "__commit__d2c023,2026-10-31\n" +
+      "\n" +
+      " 1 file changed, 0 insertions(+), 0 deletions(-)\n" +
+      "__commit__7ce13f,2026-09-01\n" +
+      "\n" +
+      " 1 file changed, 41 insertions(+), 2 deletions(-)\n";
+
+    const meta = getGitMetaForFile("content/projects/renamed.md", fakeRun);
+
+    expect(meta).toEqual({ hash: "7ce13f", date: "2026-09-01", added: 41, removed: 2 });
   });
 
   it("throws when there is no git history for the file", () => {
