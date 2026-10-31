@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { buildSitemap } from "./sitemap";
 import type { Post } from "@/lib/content/posts";
 import type { Project } from "@/lib/content/projects";
+import type { Gang } from "@/lib/content/gangs";
 
 const fakeGit = { hash: "abc123", date: "2026-07-01", added: 10, removed: 0 };
 
@@ -13,16 +14,38 @@ const fakeProjects: Project[] = [
   { slug: "a-project", title: "A Project", date: "2026-07-02", tags: [], excerpt: "A", content: "", git: fakeGit },
 ];
 
+const fakeGangs: Gang[] = [
+  {
+    slug: "a-gang",
+    title: "A Gang",
+    date: "2026-07-03",
+    faction: "Test",
+    coverPosition: "center",
+    tags: [],
+    excerpt: "A",
+    content: "",
+    git: fakeGit,
+    photos: [],
+  },
+];
+
 describe("buildSitemap", () => {
   it("includes the static routes", () => {
-    const urls = buildSitemap(fakePosts, fakeProjects).map((entry) => entry.url);
+    const urls = buildSitemap(fakePosts, fakeProjects, fakeGangs).map((entry) => entry.url);
     expect(urls).toEqual(
       expect.arrayContaining([
         "https://personal-site-ecru-eta-23.vercel.app/",
         "https://personal-site-ecru-eta-23.vercel.app/blog",
         "https://personal-site-ecru-eta-23.vercel.app/projects",
+        "https://personal-site-ecru-eta-23.vercel.app/gallery",
       ])
     );
+  });
+
+  it("includes one entry per gang, using its date as lastModified", () => {
+    const sitemap = buildSitemap(fakePosts, fakeProjects, fakeGangs);
+    const entry = sitemap.find((e) => e.url === "https://personal-site-ecru-eta-23.vercel.app/gallery/a-gang");
+    expect(entry?.lastModified).toBe("2026-07-03");
   });
 
   it("includes one entry per post, using its date as lastModified", () => {
