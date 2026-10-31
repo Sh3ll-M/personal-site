@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { href: "/", label: "home" },
   { href: "/blog", label: "blog" },
   { href: "/projects", label: "projects" },
+  { href: "/gallery", label: "gallery" },
 ];
 
 const NAV_LINK_CLASSES =
